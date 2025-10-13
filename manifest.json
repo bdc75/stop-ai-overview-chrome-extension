@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "AI Overview Prevention",
+  "version": "1.1",
+  "description": "Prevents Google from generating AI overview for every search",
+  "permissions": [
+    "webNavigation",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://www.google.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Overview Prevention"
+  },
+  "icons": {
+    "128": "icon128.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
+

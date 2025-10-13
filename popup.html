@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>No AI Overview</title>
+  <style>
+    body {
+      font-family: monospace;
+      width: 220px;
+      padding: 10px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 15px;
+    }
+
+    select,
+    input[type="checkbox"] {
+      margin-top: 5px;
+    }
+
+    p {
+      font-size: 11px;
+    }
+  </style>
+</head>
+
+<body>
+  <p>There are billions of Google searches every day.</p>
+  <p>Help reduce energy and water consumption by checking the box below &lt;3</p>
+
+  <!-- <label for="mode">Mode:</label>
+    <select id="mode">
+      <option value="-ai">-AI Mode</option>
+      <option value="web">Web Mode</option>
+    </select> -->
+
+  <strong>
+    <label>
+      <input type="checkbox" id="toggle" />
+      No AI overview!
+    </label>
+  </strong>
+
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
