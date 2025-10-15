@@ -22,17 +22,19 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     conditional_log('enabledObj', data)
     conditional_log('details', details)
     if (!data?.enabled) return;
-    const url_obj = new URL(details.url);
-    let newQuery
-    if (googleUrls.includes(url_obj.hostname) && url_obj.pathname === "/search") {
+    const urlObj = new URL(details.url);
+    // Only listen for google.com/search
+    if (googleUrls.includes(urlObj.hostname) && urlObj.pathname === "/search") {
       conditional_log('url condition met')
-      newQuery = await setNewUrl(url_obj)
+      const newQuery = await addNoAiToQuery(urlObj)
       if (newQuery) {
-        chrome.tabs.update(details.tabId, { url: url_obj.toString() });
-        chrome.storage.sync.set({ prevQuery: newQuery.trim() });
+        urlObj.searchParams.set("q", newQuery)
+        chrome.tabs.update(details.tabId, { url: urlObj.toString() });
+        chrome.storage.sync.set({ prevQuery: newQuery });
       }
       else {
-        chrome.storage.sync.set({ prevQuery: url_obj.searchParams.get("q").trim() });
+        // Keep track of previous search regardless
+        chrome.storage.sync.set({ prevQuery: urlObj.searchParams.get("q").trim() });
       }
 
       return
@@ -45,46 +47,57 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 });
 
 function removeNoAiFromQuery(query) {
-  if (!query) return
+  if (query !== "" && !query) return null
   return query.replace(no_ai_addon, "")
 }
 
+async function getPrevQuery() {
+  const data = await chrome.storage.sync.get("prevQuery")
+  return data?.prevQuery?.trim() ?? ""
+}
 
-async function setNewUrl(url_obj) {
-  const currentQuery = url_obj.searchParams.get("q")
+async function addNoAiToQuery(urlObj) {
+  let currentQuery = urlObj.searchParams.get("q")
   conditional_log('orig_query', currentQuery)
-  let newQuery
-  let data
+  if (!currentQuery) {
+    return null
+  }
+  currentQuery = currentQuery.trim()
+  let newQuery = null
+  let prevQuery
 
   // If user switches to a different search tab, e.g. "Images",
   // then we remove the " -ai" for them
-  if (url_obj.searchParams.get("udm")) {
-    data = await chrome.storage.sync.get("prevQuery")
+  if (urlObj.searchParams.get("udm")) {
+    prevQuery = await getPrevQuery()
+    // Remove " -ai" if their query didn't change, but they switched search tabs.    
     if (
-      data?.prevQuery.includes(no_ai_addon)
-      && data?.prevQuery === currentQuery
+      prevQuery.includes(no_ai_addon)
+      && prevQuery === currentQuery
     ) {
       newQuery = removeNoAiFromQuery(currentQuery)
     }
   }
+  // Don't change the URL if query already has " -ai"  (prevent infinite loop)
+  else if (currentQuery.includes(no_ai_addon)) {  
+    conditional_log('already has (or falsy)')
+    return null
+  }
+  // This is the general case
   else {
-    if (!currentQuery || currentQuery.includes(no_ai_addon)) {
-      conditional_log('already has (or falsy)')
+    prevQuery = await getPrevQuery()
+    // Don't modify their search if we detect they manually deleted the " -ai"
+    if (currentQuery !== prevQuery
+      && currentQuery === removeNoAiFromQuery(prevQuery)) {      
       return null
     }
-    data = await chrome.storage.sync.get("prevQuery")
-    if (currentQuery !== data?.prevQuery
-      && currentQuery.trim() === removeNoAiFromQuery(data?.prevQuery?.trim())) {
-      // Don't modify their search if we detect they manually deleted the " -ai"
-      return null
-    }
+    // Add " -ai" to their query
     newQuery = `${currentQuery}${no_ai_addon}`
   }
-
-  url_obj.searchParams.set("q", newQuery)
   return newQuery
 }
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.sync.set({ enabled: true });
+  chrome.storage.sync.set({ prevQuery: "" });
 });
