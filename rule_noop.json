@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "priority": 1000,
+    "action": {
+      "type": "allow"
+    },
+    "condition": {
+      "urlFilter": "google.com/search*udm=",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]

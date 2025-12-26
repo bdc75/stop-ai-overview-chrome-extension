@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Stop Google's AI Overview",
+  "version": "1.0",
+  "description": "Adds parameter to your Google search to completely prevent generation of energy-intensive AI overview.",
+  "permissions": [
+    "webRequest"
+  ],
+  "host_permissions": [
+    "https://www.google.com/*",
+    "https://www.google.co.uk/*",
+    "https://www.google.ca/*",
+    "https://www.google.de/*",
+    "https://www.google.com.au/*",
+    "https://www.google.co.in/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "128": "icon128.png"
+  }
+}

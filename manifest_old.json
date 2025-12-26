@@ -1,15 +1,31 @@
 {
   "manifest_version": 3,
   "name": "AI Overview Prevention",
-  "version": "1.4",
+  "version": "1.0",
   "description": "Prevents Google from generating AI overview for every search",
   "permissions": [
-    "webNavigation",    
+    "declarativeNetRequest",
+    "webNavigation",
+    "tabs",
     "storage"
   ],
   "host_permissions": [
     "https://www.google.com/*"
   ],
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "ruleset_1",
+        "enabled": false,
+        "path": "rule_noop.json"
+      },
+      {
+        "id": "ruleset_2",
+        "enabled": false,
+        "path": "rule_udm.json"
+      }
+    ]
+  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "AI Overview Prevention"

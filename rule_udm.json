@@ -1,0 +1,28 @@
+[
+  {
+    "id": 2,
+    "priority": 500,
+    "action": {
+      "type": "redirect",
+
+      "redirect": {
+        "transform": {
+          "queryTransform": {
+            "addOrReplaceParams": [
+              {
+                "key": "udm",
+                "value": "14"
+              }
+            ]
+          }
+        }
+      }
+
+    },
+    "condition": {      
+      "urlFilter": "google.com/search",
+      "resourceTypes": ["main_frame"]      
+      
+    }
+  }
+]
